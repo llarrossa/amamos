@@ -27,7 +27,7 @@
 
                 @if(request()->has('risco'))
                     @if($medicamentos->isNotEmpty())
-                        <div class="list-group w-75 mt-3" style="background-color: #fff;">
+                        <div class="row list-group mt-3" style="background-color: #fff;">
                             @foreach($medicamentos as $medicamento)
                                   <a href="#" class="list-group-item list-group-item-action" aria-current="true" style="background-color: #bebebf;">
                                     <div class="d-flex w-100 justify-content-between">

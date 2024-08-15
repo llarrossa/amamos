@@ -46,6 +46,8 @@ Route::controller(AuthController::class)->group(function (){
 Route::controller(CategoriaController::class)->group(function (){
     Route::get('/categoria','index')->name('categoria.index');
     Route::post('/categoria','store')->name('categoria.store');
+    Route::get('/categoria/{id}/editar','edit')->name('categoria.edit');
+    Route::post('/categoria/{id}/editar','update')->name('categoria.update');
 //    Route::get('categoria','destroy')->name('categoria.destroy');
 });
 

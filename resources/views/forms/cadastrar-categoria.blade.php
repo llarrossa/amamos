@@ -77,7 +77,7 @@
                             <!--<td data-title='Id'> $categoria->id </td>-->
                             <td data-title="Ações" style='text-align:right;'>
 
-                                <a href='{{-- route("editcategoria", $categoria->id)--}} '><button type='button' class='btn btn-sm btn-warning'>Editar</button></a>
+                                <a  href='{{ route('categoria.edit', ['id' => $categoria->id]) }}'><button type='button' class='btn btn-sm btn-warning'>Editar</button></a>
 
                                 <form action="{{-- route('excluircategoria', $categoria->id) --}}" method="post"
                                       style="display:inline-block;">

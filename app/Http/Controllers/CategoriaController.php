@@ -11,7 +11,7 @@ class CategoriaController extends Controller
     public function index()
     {
         $categorias = DB::table('categorias')
-            ->select('nome as nome')
+            ->select('id', 'nome as nome')
             ->orderBy('nome')
             ->get();
 
@@ -42,6 +42,36 @@ class CategoriaController extends Controller
         }
 
 
+    }
+
+    public function edit($id)
+    {
+        // Busca a categoria pelo ID
+        $categoria = Categoria::findOrFail($id);
+
+        $categoria = ['id' => $categoria->id, 'nome' => $categoria->nome];
+
+        // Retorna a view de edição com os dados da categoria
+        return view('forms.editar-categoria', ['categoria' => $categoria]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nome' => 'required|max:150|unique:categorias'
+        ],  [
+            'nome.unique' => 'Esse registro já existe',
+        ]);
+
+        // Busca a categoria pelo ID
+        $categoria = Categoria::findOrFail($id);
+
+        // Atualiza os dados da categoria
+        $categoria->nome = $request->nome;
+        $categoria->save();
+
+        // Redireciona para a lista de categorias com uma mensagem de sucesso
+        return redirect()->route('categoria.index');
     }
 
     public function destroy(Request $request)
