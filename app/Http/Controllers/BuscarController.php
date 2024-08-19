@@ -18,13 +18,17 @@ class BuscarController extends Controller
         // Inicializando a coleção de medicamentos como vazia
         $medicamentos = collect();
 
+        $categoria = $request->input('categoria_id') ?? $request->input('categoria');
+
+        // var_dump($categoria);die();
+
         // Verificando se uma categoria foi selecionada
-        if ($request->has('categoria_id') && $request->categoria_id != 'Selecione uma opção...') {
+        // if ($request->has('categoria_id') && $request->categoria_id != 'Selecione uma opção...') {
             // Buscando os medicamentos pela categoria selecionada
-            $medicamentos = Medicamento::where('categoria_id', $request->categoria_id)
+            $medicamentos = Medicamento::where('categoria_id', $categoria)
                                         ->select('nome', 'descricao', 'risco') // Seleciona apenas as colunas necessárias
                                         ->get();
-        }
+        // }
 
         return view('buscar.categoria', compact('categorias', 'medicamentos'));
     }
@@ -34,16 +38,32 @@ class BuscarController extends Controller
         // Inicializando a coleção de medicamentos como vazia
         $medicamentos = collect();
 
-        // Verificando se um nome foi fornecido na busca
         if ($request->has('nome') && !empty($request->nome)) {
-            // Buscando os medicamentos pelo nome fornecido e carregando a relação com a categoria
             $medicamentos = Medicamento::where('nome', 'like', '%' . $request->nome . '%')
-                ->with('categoria:id,nome') // Carregando a relação 'categoria' e selecionando apenas os campos 'id' e 'nome'
-                ->get(['nome', 'descricao', 'risco', 'categoria_id']); // Selecionando os campos do modelo Medicamento
+                ->with('categoria:id,nome,id_pai')  // Incluir id_pai
+                ->get(['nome', 'descricao', 'risco', 'categoria_id']);
         }
+
+        // Processar os medicamentos para buscar a categoria pai, se tiver
+        $medicamentos = $medicamentos->map(function ($medicamento) {
+            $categoria = Categoria::find($medicamento->categoria_id);
+
+            if ($categoria && $categoria->id_pai) {
+                $categoriaPai = Categoria::find($categoria->id_pai);
+                if ($categoriaPai) {
+                    $medicamento->categoria_pai_nome = $categoriaPai->nome;
+                }
+            } else {
+                $medicamento->categoria_pai_nome = null;
+            }
+
+            return $medicamento;
+        });
 
         return view('buscar.nome', compact('medicamentos'));
     }
+
+
 
    public function buscarPorRisco(Request $request)
    {

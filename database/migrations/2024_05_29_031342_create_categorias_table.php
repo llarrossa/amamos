@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('categorias', function (Blueprint $table) {
             $table->id();
+            $table->enum('tipo', ['cat', 'sub']);
+            $table->unsignedBigInteger('id_pai')->nullable();
             $table->string('nome');
+            $table->foreign('id_pai')
+                ->references('id')
+                ->on('categorias')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }

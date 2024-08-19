@@ -1,6 +1,6 @@
 @auth
-    @extends("layouts.index")
-    @section("main")
+@extends("layouts.index")
+@section("main")
 
         @push('categoria')
             <style>
@@ -41,20 +41,35 @@
                 @csrf
 
                 <div class="col-12">
-                    <label for="nome" class="form-label">Edite o nome da categoria</label>
+                    <label for="nome" class="form-label"><h4>Edite o nome da categoria</h4></label>
                     <input type="text" class="form-control @error('nome') is-invalid @enderror" name="nome" placeholder="Nome da categoria" tabindex="1" value="{{ $categoria['nome'] }}">
-
                     @error('nome')
                     <div class="invalid-feedback">
                         {{ $message }}
                     </div>
                     @enderror
+                    @if($categoria['tipo'] === 'sub')
+                        <div id="categoriaSelectContainer" class="mt-5">
+                            <label for="id_pai" class="form-label"><h4>Selecione a categoria relacionada:</h4></label>
+                            <select name="id_pai" id="id_pai" class="form-select mb-3">
+                                <option value="">Selecione uma Categoria</option>
+                                @foreach ($categorias as $cat)
+                                    @if ($cat['tipo'] === 'cat' && $cat['id_pai'] === null)
+                                        <option value="{{ $cat['id'] }}" 
+                                            @if($cat['id'] == $categoria['id_pai']) selected @endif>
+                                            {{ $cat['nome'] }}
+                                        </option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="col-12">
-                    <p style="text-align: right;">
-                        <button type="submit" class="btn btn-lg btn-success btn-block" value="cadastrar" tabindex="3">
-                            <a class="nav-link text-white">Atualizar</a>
+                    <p style="text-align: center;">
+                        <button type="submit" class="btn btn-lg btn-success btn-block" value="atualizar" tabindex="3">
+                            Atualizar
                         </button>
                     </p>
                 </div>
@@ -77,7 +92,7 @@
 {{--                                <!--<td data-title='Id'> $categoria->id </td>-->--}}
 {{--                                <td data-title="Ações" style='text-align:right;'>--}}
 
-{{--                                    <a  href='{{ route('categoria.edit', ['id' => $categoria->id]) }}'><button type='button' class='btn btn-sm btn-warning'>Editar</button></a>--}}
+{{--                                    <a  href='{{ route("categoria.edit", ["id" => $categoria->id]) }}'><button type='button' class='btn btn-sm btn-warning'>Editar</button></a>--}}
 
 {{--                                    <form action="--}}{{-- route('excluircategoria', $categoria->id) --}}{{--" method="post"--}}
 {{--                                          style="display:inline-block;">--}}

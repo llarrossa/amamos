@@ -48,11 +48,15 @@ Route::controller(CategoriaController::class)->group(function (){
     Route::post('/categoria','store')->name('categoria.store');
     Route::get('/categoria/{id}/editar','edit')->name('categoria.edit');
     Route::post('/categoria/{id}/editar','update')->name('categoria.update');
-//    Route::get('categoria','destroy')->name('categoria.destroy');
+    Route::delete('/categoria/{id}/excluir','destroy')->name('categoria.destroy');
 });
 
 Route::controller(MedicamentoController::class)->group(function (){
     Route::get('/medicamento','index')->name('medicamento.index');
     Route::post('/medicamento','store')->name('medicamento.store');
-//    Route::get('categoria','destroy')->name('categoria.destroy');
+    Route::get('/medicamento/{id}/editar','edit')->name('medicamento.edit');
+    Route::post('/medicamento/{id}/editar','update')->name('medicamento.update');
+    Route::delete('/medicamento/{id}/excluir','destroy')->name('medicamento.destroy');
 });
+
+Route::get('/categorias/{id}', [MedicamentoController::class, 'getSubcategorias']);

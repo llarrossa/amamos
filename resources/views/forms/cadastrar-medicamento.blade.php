@@ -1,8 +1,9 @@
+@auth
 @extends("layouts.index")
 @section("main")
 
     <div class="row justify-content-center">
-        <div class="col-9">
+        <div class="col-12 col-md-9">
             @if(session()->has('success'))
                 <div class="alert alert-success">
                     {{ session('success') }}
@@ -18,9 +19,28 @@
                     </ul>
                 </div>
             @endif
-            <form action="{{-- route('store') --}}" method="post">
+            <form action="{{ route('medicamento.store') }}" method="post">
 
                 @csrf
+
+               <div class="mb-3">
+                   <label for="categoria" class="form-label">Categoria:</label>
+                   <select class="form-select" name="categoria" id="categoria" tabindex="1" required>
+                       <option value="">Selecione</option>
+                       @foreach ($categorias->where('tipo', 'cat') as $categoria)
+                           <option value="{{ $categoria->id }}">
+                               {{ $categoria->nome }}
+                           </option>
+                       @endforeach
+                   </select>
+               </div>
+
+               <div class="mb-3" id="subcategoria-container" style="display:none;">
+                   <label for="categoria_id" class="form-label">Subcategoria:</label>
+                   <select class="form-select" name="categoria_id" id="categoria_id" tabindex="1">
+                       <option value="">Selecione</option>
+                   </select>
+               </div>
 
                 <div class="mb-3">
                     <label for="nome" class="form-label">Nome</label>
@@ -29,19 +49,7 @@
 
                 <div class="mb-3">
                     <label for="descricao" class="form-label">Descrição</label>
-                    <input type="text" class="form-control" id="descricao" name="descricao" value="{{ old('descricao') }}">
-                </div>
-
-                <div class="mb-3">
-                    <label for="categoria" class="form-label">Categoria:</label>
-                    <select class="form-select" name="categoria_id" tabindex="1" required>
-                        <option selected>Selecione</option>
-                        @foreach ($categorias as $categoria)
-                            <option value="{{ $categoria->id }}">
-                                {{ $categoria->nome }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <textarea name="descricao" id="descricao" cols="30" rows="2" class="form-control" value="{{ old('descricao') }}"></textarea>
                 </div>
 
                 <div class="mb-3">
@@ -60,44 +68,69 @@
                 </div>
             </form>
 
-            <div class="col-md-12 mx-auto justify-content-center align-items-center flex-column">
-                <table id="table-medicamentos" class="table table-striped table-md">
-                    <div class="table-responsive">
-                        <thead>
+            <div class="table-responsive mt-4">
+                <table id="table-medicamentos" class="table table-striped table-bordered">
+                    <thead>
                         <tr>
-                            <th>Nome</th>
-                            <th>Categoria</th>
-                            <th>Risco</th>
-                            <!--<th>Id</th>-->
-                            <th style='text-align:right;'>Ações</th>
+                            <th style="width: 30%;">Nome</th>
+                            <th style="width: 30%;">Categoria</th>
+                            <th style="width: 20%;">Risco</th>
+                            <th style="width: 20%; text-align: right;">Ações</th>
                         </tr>
-                        </thead>
-                        <tbody>
+                    </thead>
+                    <tbody>
                         @foreach ($medicamentos as $medicamento)
                             <tr>
                                 <td class='fw-bold'>{{ $medicamento->nome }}</td>
                                 <td class='fw-bold'>{{ $medicamento->categoria->nome }}</td>
                                 <td class='fw-bold'>{{ $medicamento->risco }}</td>
-                                <!--<td data-title='Id'> $medicamento)->id </td>-->
-                                <td data-title="Ações" style='text-align:right;'>
-
-                                    <a href='{{-- route("editcategoria", $medicamento)->id)--}} '><button type='button' class='btn btn-sm btn-warning'>Editar</button></a>
-
-                                    <form action="{{-- route('excluircategoria', $medicamento)->id) --}}" method="post"
-                                          style="display:inline-block;">
+                                <td style='text-align:right;'>
+                                    <a href='{{ route("medicamento.edit", ["id" => $medicamento->id]) }}' class="btn btn-sm btn-warning">Editar</a>
+                                    <form action="{{ route('medicamento.destroy', ['id' => $medicamento->id]) }}" method="post" style="display:inline-block;">
                                         @csrf
-                                        {{--@method('DELETE')--}}
-                                        <button type="submit" class="btn btn-sm btn-danger" value="excluir">Excluir</button>
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
                                     </form>
+                                </td>
+                            </tr>
                         @endforeach
-                        </tbody>
-                    </div>
+                    </tbody>
                 </table>
                 @if (count($medicamentos) == 0)
-                    <p style="text-align: center;"> Não existe medicamentos cadastrados no sistema</p>
+                    <p class="text-center">Não existem medicamentos cadastrados no sistema</p>
                 @endif
             </div>
         </div>
     </div>
 
+    <script>
+        $(document).ready(function() {
+            $('#categoria').on('change', function() {
+                var categoriaId = $(this).val();
+                var $subCategoriaSelect = $('#categoria_id');
+                var $subCategoriaContainer = $('#subcategoria-container');
+                
+                if (categoriaId) {
+                    $.ajax({
+                        url: '/categorias/' + categoriaId,
+                        type: 'GET',
+                        success: function(data) {
+                            $subCategoriaSelect.empty().append('<option value="">Selecione</option>');
+                            $.each(data, function(index, categoria) {
+                                $subCategoriaSelect.append('<option value="' + categoria.id + '">' + categoria.nome + '</option>');
+                            });
+                            $subCategoriaContainer.show();
+                        },
+                        error: function() {
+                            console.error('Erro ao carregar subcategorias.');
+                        }
+                    });
+                } else {
+                    $subCategoriaContainer.hide().find('select').empty().append('<option value="">Selecione</option>');
+                }
+            });
+        });
+    </script>
+
 @endsection
+@endauth

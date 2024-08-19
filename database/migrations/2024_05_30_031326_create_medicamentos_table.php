@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('medicamentos', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
-            $table->string('descricao');
-            $table->string('risco');
+            $table->string('descricao')->nullable();
+            $table->enum('risco', ['compativel', 'criterioso', 'contraindicado']);
             $table->unsignedBigInteger('categoria_id');
             $table->foreign('categoria_id')
                 ->references('id')
